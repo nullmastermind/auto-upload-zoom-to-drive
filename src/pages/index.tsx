@@ -1,5 +1,5 @@
 import { Button, Divider, TextInput } from "@mantine/core";
-import { useLocalStorage } from "react-use";
+import { useLocalStorage, useSetState } from "react-use";
 import Link from "next/link";
 import axios from "axios";
 
@@ -8,6 +8,9 @@ export default function Home() {
   const [zoomFolder, setZoomFolder] = useLocalStorage(":zoomFolder", "Documents/Zoom");
   const [accessToken, setAccessToken] = useLocalStorage(":accessToken", "");
   const [refreshToken, setRefreshToken] = useLocalStorage(":refreshToken", "");
+  const [loadings, setLoadings] = useSetState({
+    reload: false,
+  });
 
   return (
     <main className="m-auto max-w-xl">
@@ -58,8 +61,10 @@ export default function Home() {
         <Divider />
         <div>
           <Button
+            loading={loadings.reload}
             variant="gradient"
             onClick={() => {
+              setLoadings({ reload: true });
               axios
                 .post("/api/getVideos", {
                   drive: {
@@ -69,7 +74,9 @@ export default function Home() {
                   folderId,
                   zoomFolder,
                 })
-                .finally();
+                .finally(() => {
+                  setLoadings({ reload: false });
+                });
             }}
           >
             Reload Files
