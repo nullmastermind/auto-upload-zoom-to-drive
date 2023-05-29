@@ -8,7 +8,14 @@ const clientId = "636038632941-rrlqtq7h3gp8l4ipu64d8pnunhpqrr8q.apps.googleuserc
 const clientSecret = "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";
 const redirectUri = "http://localhost:3000";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+type DriveFile = {
+  kind: "drive#file";
+  mimeType: string;
+  id: string;
+  name: string;
+};
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
   oauth2Client.setCredentials({
     ...req.body.drive,
@@ -16,16 +23,19 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   // your oauth method, see documentation
 
   const drive = google.drive({ version: "v3", auth: oauth2Client });
-
-  drive.files.list(
-    {
-      q: `'${req.body.folderId}' in parents`,
-    },
-    (err, data) => {
-      if (err) throw err;
-      console.log("your files", data?.data);
-    },
-  );
+  const getFiles = async (): Promise<any> => {
+    return new Promise((rel) => {
+      drive.files.list(
+        {
+          q: `'${req.body.folderId}' in parents`,
+        },
+        (err, data) => {
+          if (err) throw err;
+          rel(data?.data?.files || []);
+        },
+      );
+    }).catch(() => Promise.resolve([]));
+  };
 
   let videoDir = path.join(os.homedir(), "OneDrive", req.body.zoomFolder);
   if (!fs.existsSync(videoDir)) {
@@ -35,11 +45,25 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const videoFiles = getAllFilesRecursive(videoDir)
     .filter((v) => v.endsWith(".mp4"))
     .map((v) => {
-      const dirName = path.dirname(v).split(path.sep).pop();
+      const dirName = path.dirname(v).split(path.sep).pop() as string;
       const dateInfo = dirName!.split(" ");
       const date = dateInfo.shift() as string;
       const time = (dateInfo.shift() as string).split(".").join(":");
-      const keywords = dateInfo.join(" ");
+      const keywords = [dateInfo.join(" ")];
+      const chatFile = path.join(videoDir, dirName, "chat.txt");
+
+      if (fs.existsSync(chatFile)) {
+        fs.readFileSync(chatFile, "utf-8")
+          .split("\n")
+          .map((v) => v.trim())
+          .filter((v) => v.length > 0)
+          .forEach((line) => {
+            const phone = line.split(":").pop();
+            if (phone && phone.trim().length > 0) {
+              keywords.push(phone.trim());
+            }
+          });
+      }
 
       return {
         fullPath: v,
@@ -54,6 +78,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   res.status(200).json({
     files: videoFiles,
+    driveFiles: (await getFiles()).filter((v: DriveFile) => v.mimeType === "application/vnd.google-apps.folder"),
   });
 }
 
