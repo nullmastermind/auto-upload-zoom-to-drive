@@ -2,11 +2,34 @@ import { NextApiRequest, NextApiResponse } from "next";
 import * as fs from "fs";
 import path from "path";
 import * as os from "os";
+import { google } from "googleapis";
+
+const clientId = "636038632941-rrlqtq7h3gp8l4ipu64d8pnunhpqrr8q.apps.googleusercontent.com";
+const clientSecret = "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";
+const redirectUri = "http://localhost:3000";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  let videoDir = path.join(os.homedir(), "OneDrive", "Documents", "Zoom");
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+  oauth2Client.setCredentials({
+    ...req.body.drive,
+  });
+  // your oauth method, see documentation
+
+  const drive = google.drive({ version: "v3", auth: oauth2Client });
+
+  drive.files.list(
+    {
+      q: `'${req.body.folderId}' in parents`,
+    },
+    (err, data) => {
+      if (err) throw err;
+      console.log("your files", data?.data);
+    },
+  );
+
+  let videoDir = path.join(os.homedir(), "OneDrive", req.body.zoomFolder);
   if (!fs.existsSync(videoDir)) {
-    videoDir = path.join(os.homedir(), "Documents", "Zoom");
+    videoDir = path.join(os.homedir(), req.body.zoomFolder);
   }
 
   const videoFiles = getAllFilesRecursive(videoDir)
