@@ -183,7 +183,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
         <NativeSelect
           label={"Student"}
           size={"sm"}
-          className={"w-full"}
+          className={"flex-grow"}
           data={[
             {
               label: "---",
@@ -204,7 +204,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
         <TextInput
           label={"File name"}
           size={"sm"}
-          className={"w-full"}
+          className={"w-32"}
           value={fileName}
           onChange={(e) => setFileName(e.target.value)}
         />
