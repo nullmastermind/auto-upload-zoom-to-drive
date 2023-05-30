@@ -1,4 +1,15 @@
-import { ActionIcon, Button, Card, Collapse, Divider, Highlight, Text, TextInput, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Card,
+  Collapse,
+  Divider,
+  Highlight,
+  NativeSelect,
+  Text,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import { useLocalStorage, useSetState } from "react-use";
 import Link from "next/link";
 import axios from "axios";
@@ -141,7 +152,17 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
         {file.fullPath}
       </Text>
       <div className={"flex flex-row gap-2 items-center"}>
-        <TextInput label={"Student"} size={"sm"} className={"w-full"} />
+        <NativeSelect
+          label={"Student"}
+          size={"sm"}
+          className={"w-full"}
+          data={driveFolders.map((v) => {
+            return {
+              label: v.name,
+              value: v.id,
+            };
+          })}
+        />
         <TextInput label={"File name"} size={"sm"} className={"w-full"} />
       </div>
       <div>
