@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { drive_v3 } from "googleapis";
+import { DriveFileData } from "@/utility/types";
 
 export const refreshToken = async (
   refreshToken: string,
@@ -19,16 +20,16 @@ export const refreshToken = async (
   }
 };
 
-export const getDriveFiles = async (drive: drive_v3.Drive, folderId: string): Promise<any> => {
+export const getDriveFiles = async (drive: drive_v3.Drive, folderId: string): Promise<DriveFileData[]> => {
   return new Promise((rel) => {
     drive.files.list(
       {
-        q: `'${folderId}' in parents`,
+        q: `'${folderId}' in parents and trashed=false`,
       },
       (err, data) => {
         if (err) throw err;
         rel(data?.data?.files || []);
       },
     );
-  }).catch(() => Promise.resolve([]));
+  }).catch(() => Promise.resolve([])) as any;
 };

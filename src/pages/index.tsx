@@ -236,8 +236,20 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
             <ActionIcon
               onClick={() => {
                 setLoadings({ suggesting: true });
+                axios.post("/api/suggest", {
+                  drive: {
+                    access_token: accessToken,
+                    refresh_token: refreshToken,
+                  },
+                  folderId: student,
+                  origin: fileName,
+                  saveAt: file.saveAt,
+                });
               }}
               loading={loadings.suggesting}
+              disabled={!student}
+              variant={"outline"}
+              color={"blue"}
             >
               <IconBulb />
             </ActionIcon>
