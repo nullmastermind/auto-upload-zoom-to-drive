@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Card, Collapse, NativeSelect, Text, TextInput, Title } from "@mantine/core";
+import { ActionIcon, Button, Card, Checkbox, Collapse, NativeSelect, Text, TextInput, Title } from "@mantine/core";
 import { useLocalStorage, useSetState } from "react-use";
 import Link from "next/link";
 import axios from "axios";
@@ -143,6 +143,7 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
   const [student, setStudent] = useState<string>();
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
   const [loading, setLoading] = useState(false);
+  const [deleteVideo, setDeleteVideo] = useState(true);
 
   useEffect(() => {
     if (student !== undefined) return;
@@ -197,7 +198,7 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
           onChange={(e) => setFileName(e.target.value)}
         />
       </div>
-      <div>
+      <div className={"flex flex-row gap-2 items-center"}>
         <Button
           loading={loading}
           disabled={!student}
@@ -226,6 +227,11 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
         >
           Upload
         </Button>
+        <Checkbox
+          label={"Delete the video after uploading"}
+          checked={deleteVideo}
+          onChange={(e) => setDeleteVideo(e.target.checked)}
+        />
       </div>
     </div>
   );
