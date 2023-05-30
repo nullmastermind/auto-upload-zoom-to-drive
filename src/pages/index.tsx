@@ -142,6 +142,7 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
   const [refreshToken] = useLocalStorage(":refreshToken", "");
   const [student, setStudent] = useState<string>();
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (student !== undefined) return;
@@ -198,18 +199,29 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
       </div>
       <div>
         <Button
+          loading={loading}
           disabled={!student}
           variant={"outline"}
           onClick={() => {
-            axios.post("/api/upload", {
-              drive: {
-                access_token: accessToken,
-                refresh_token: refreshToken,
-              },
-              folderId: student,
-              fileName: fileName + ".mp4",
-              filePath: file.fullPath,
-            });
+            setLoading(true);
+            axios
+              .post("/api/upload", {
+                drive: {
+                  access_token: accessToken,
+                  refresh_token: refreshToken,
+                },
+                folderId: student,
+                fileName: fileName + ".mp4",
+                filePath: file.fullPath,
+              })
+              .then(({ data }) => {
+                if (data?.fileId) {
+                  console.log("OK", data);
+                }
+              })
+              .finally(() => {
+                setLoading(false);
+              });
           }}
         >
           Upload
