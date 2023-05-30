@@ -120,7 +120,12 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
       {map(files, (file, index) => {
         return (
           <Card withBorder key={index}>
-            <Text size={'sm'} className={'opacity-60'}>{file.fullPath}</Text>
+            <video width="320" height="240" controls>
+              <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
+            </video>
+            <Text size={"sm"} className={"opacity-60"}>
+              {file.fullPath}
+            </Text>
           </Card>
         );
       })}
