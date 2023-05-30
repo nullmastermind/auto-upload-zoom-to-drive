@@ -145,6 +145,7 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
 
   useEffect(() => {
+    console.log("student", student);
     if (student) return;
 
     for (let i = 0; i < driveFolders.length; i++) {
@@ -185,6 +186,9 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
             }),
           ]}
           value={student}
+          onChange={(event) => {
+            setStudent(event.target.value);
+          }}
         />
         <TextInput
           label={"File name"}
@@ -195,7 +199,21 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
         />
       </div>
       <div>
-        <Button variant={"outline"}>Upload</Button>
+        <Button
+          disabled={!student}
+          variant={"outline"}
+          onClick={() => {
+            axios.post("/api/upload", {
+              drive: {
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              },
+              folderId: student,
+            });
+          }}
+        >
+          Upload
+        </Button>
       </div>
     </div>
   );
