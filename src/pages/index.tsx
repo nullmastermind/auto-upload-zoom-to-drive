@@ -4,6 +4,7 @@ import Link from "next/link";
 import axios from "axios";
 import { IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
 
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
@@ -14,6 +15,8 @@ export default function Home() {
     reload: false,
   });
   const [opened, { toggle, close }] = useDisclosure(false);
+  const [driveFolders, setDriveFolders] = useState<any[]>([]);
+  const [files, setFiles] = useState<any[]>([]);
 
   return (
     <main className="m-auto max-w-xl py-10 px-2">
@@ -36,6 +39,12 @@ export default function Home() {
                 folderId,
                 zoomFolder,
               })
+              .then(({ data }) => {
+                console.log("data", data);
+                setDriveFolders(data.driveFolders || []);
+                setFiles(data.files || []);
+              })
+              .catch(() => alert("error"))
               .finally(() => {
                 setLoadings({ reload: false });
               });
