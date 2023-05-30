@@ -149,6 +149,15 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
 function DateInfo({ originDate }: { originDate: any }) {
   const [info, setInfo] = useState(moment(originDate).fromNow());
 
+  useEffect(() => {
+    const t = setInterval(() => {
+      setInfo(moment(originDate).fromNow());
+    }, 60000);
+    return () => {
+      clearInterval(t);
+    };
+  }, [originDate]);
+
   return (
     <Text size={"xs"} className={"px-2"}>
       {moment(originDate).format("DD/MM")} ({info})
