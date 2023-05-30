@@ -16,8 +16,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const files = await getDriveFiles(drive, folderId);
   let maxId = 0;
 
-  console.log("fileNames", fileNames);
-
   const handleFileName = (fileName: string) => {
     const fileNameArr = fileName.split(" ");
     if (fileNameArr.length && fileNameArr[0].startsWith("b")) {
