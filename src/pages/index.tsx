@@ -128,7 +128,7 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
               <video width="280" controls className={"rounded-md"}>
                 <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
               </video>
-              <FileUpload file={file} driveFolders={driveFolders} />
+              <FileUpload index={index} file={file} driveFolders={driveFolders} />
             </div>
           </Card>
         );
@@ -137,7 +137,7 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
   );
 }
 
-function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: DriveFileData[] }) {
+function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolders: DriveFileData[]; index: number }) {
   const localStorageRemoveKey = `${file.fullPath}:remove`;
   const [accessToken] = useLocalStorage(":accessToken", "");
   const [refreshToken] = useLocalStorage(":refreshToken", "");
@@ -166,9 +166,12 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
 
   return (
     <div className={"flex flex-col gap-2"}>
-      <Text size={"sm"} className={"opacity-60"}>
-        {file.fullPath}
-      </Text>
+      <div className={"flex flex-row gap-2 items-center"}>
+        <Text style={{ minWidth: 30 }}>{index + 1}.</Text>
+        <Text size={"sm"} className={"opacity-60"}>
+          {file.fullPath}
+        </Text>
+      </div>
       <div className={"flex flex-row gap-2 items-center"}>
         <NativeSelect
           label={"Student"}
@@ -233,7 +236,7 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
           Upload
         </Button>
         <Checkbox
-          label={"Delete the video after uploading"}
+          label={"Delete local file after uploading"}
           checked={deleteVideo}
           onChange={(e) => setDeleteVideo(e.target.checked)}
         />
