@@ -125,15 +125,28 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
               <video width="280" controls className={"rounded-md"}>
                 <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
               </video>
-              <div>
-                <Text size={"sm"} className={"opacity-60"}>
-                  {file.fullPath}
-                </Text>
-              </div>
+              <FileUpload file={file} driveFolders={driveFolders} />
             </div>
           </Card>
         );
       })}
+    </div>
+  );
+}
+
+function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: any[] }) {
+  return (
+    <div className={"flex flex-col gap-2"}>
+      <Text size={"sm"} className={"opacity-60"}>
+        {file.fullPath}
+      </Text>
+      <div className={"flex flex-row gap-2 items-center"}>
+        <TextInput label={"Student"} size={"sm"} className={"w-full"} />
+        <TextInput label={"File name"} size={"sm"} className={"w-full"} />
+      </div>
+      <div>
+        <Button variant={"outline"}>Upload</Button>
+      </div>
     </div>
   );
 }
