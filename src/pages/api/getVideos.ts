@@ -78,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   res.status(200).json({
     files: videoFiles,
-    driveFiles: (await getFiles()).filter((v: DriveFile) => v.mimeType === "application/vnd.google-apps.folder"),
+    driveFolders: (await getFiles()).filter((v: DriveFile) => v.mimeType === "application/vnd.google-apps.folder"),
   });
 }
 
