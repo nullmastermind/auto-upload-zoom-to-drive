@@ -3,7 +3,7 @@ import * as fs from "fs";
 import path from "path";
 import * as os from "os";
 import { google } from "googleapis";
-import { refreshToken } from "@/utility/utils";
+import { getDriveFiles, refreshToken } from "@/utility/utils";
 
 export const clientId = "636038632941-rrlqtq7h3gp8l4ipu64d8pnunhpqrr8q.apps.googleusercontent.com";
 export const clientSecret = "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";
@@ -32,19 +32,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     access_token: accessTokens[req.body.drive.refresh_token],
   });
   const drive = google.drive({ version: "v3", auth: oauth2Client });
-  const getFiles = async (): Promise<any> => {
-    return new Promise((rel) => {
-      drive.files.list(
-        {
-          q: `'${req.body.folderId}' in parents`,
-        },
-        (err, data) => {
-          if (err) throw err;
-          rel(data?.data?.files || []);
-        },
-      );
-    }).catch(() => Promise.resolve([]));
-  };
 
   let videoDir = path.join(os.homedir(), "OneDrive", req.body.zoomFolder);
   if (!fs.existsSync(videoDir)) {
@@ -95,7 +82,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   res.status(200).json({
     files: videoFiles,
-    driveFolders: (await getFiles()).filter((v: DriveFile) => v.mimeType === "application/vnd.google-apps.folder"),
+    driveFolders: (await getDriveFiles(drive, req.body.folderId)).filter(
+      (v: DriveFile) => v.mimeType === "application/vnd.google-apps.folder",
+    ),
   });
 }
 
