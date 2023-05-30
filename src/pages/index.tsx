@@ -224,6 +224,9 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
               })
               .finally(() => {
                 setLoading(false);
+                if (deleteVideo) {
+                  localStorage.removeItem(localStorageRemoveKey);
+                }
               });
           }}
         >
