@@ -12,6 +12,7 @@ import validator from "validator";
 import isMobilePhone = validator.isMobilePhone;
 
 const useRemovedFiles = createGlobalState<Record<string, boolean>>({});
+const useSuggestLoading = createGlobalState<Record<string, boolean>>({});
 
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
@@ -177,6 +178,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
   });
   const [deleteVideo, setDeleteVideo] = useLocalStorage(localStorageRemoveKey, true);
   const [removedFiles, setRemovedFiles] = useRemovedFiles();
+  const [suggestLoading, setSuggestLoading] = useSuggestLoading();
 
   useEffect(() => {
     if (student !== undefined) return;
@@ -236,6 +238,10 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
             <ActionIcon
               onClick={() => {
                 setLoadings({ suggesting: true });
+                setSuggestLoading({
+                  ...suggestLoading,
+                  [student as string]: true,
+                });
                 axios
                   .post("/api/suggest", {
                     drive: {
@@ -251,10 +257,14 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
                   })
                   .finally(() => {
                     setLoadings({ suggesting: false });
+                    setSuggestLoading({
+                      ...suggestLoading,
+                      [student as string]: false,
+                    });
                   });
               }}
               loading={loadings.suggesting}
-              disabled={!student}
+              disabled={!student || suggestLoading[student as string]}
               variant={"outline"}
               color={"blue"}
             >
