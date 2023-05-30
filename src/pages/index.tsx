@@ -1,22 +1,11 @@
-import {
-  ActionIcon,
-  Button,
-  Card,
-  Collapse,
-  Divider,
-  Highlight,
-  NativeSelect,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
+import { ActionIcon, Button, Card, Collapse, NativeSelect, Text, TextInput, Title } from "@mantine/core";
 import { useLocalStorage, useSetState } from "react-use";
 import Link from "next/link";
 import axios from "axios";
 import { IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { forEach, map } from "lodash";
+import { map } from "lodash";
 import { DriveFileData, FileData } from "@/utility/types";
 import moment from "moment";
 import validator from "validator";
