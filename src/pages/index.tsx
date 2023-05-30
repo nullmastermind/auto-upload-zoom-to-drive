@@ -138,12 +138,13 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
 }
 
 function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: DriveFileData[] }) {
+  const localStorageRemoveKey = `${file.fullPath}:remove`;
   const [accessToken] = useLocalStorage(":accessToken", "");
   const [refreshToken] = useLocalStorage(":refreshToken", "");
   const [student, setStudent] = useState<string>();
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
   const [loading, setLoading] = useState(false);
-  const [deleteVideo, setDeleteVideo] = useLocalStorage(`${file.fullPath}:remove`, true);
+  const [deleteVideo, setDeleteVideo] = useLocalStorage(localStorageRemoveKey, true);
 
   useEffect(() => {
     if (student !== undefined) return;
