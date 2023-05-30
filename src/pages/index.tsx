@@ -16,7 +16,7 @@ export default function Home() {
   const [opened, { toggle, close }] = useDisclosure(false);
 
   return (
-    <main className="m-auto max-w-xl py-10">
+    <main className="m-auto max-w-xl py-10 px-2">
       <div className={"flex flex-row gap-3 items-center"}>
         <ActionIcon variant={"outline"} onClick={toggle}>
           <IconSettings />
