@@ -131,15 +131,28 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
         return (
           <Card withBorder key={index}>
             <div className={"flex flex-row gap-2 items-start"}>
-              <video width="280" controls className={"rounded-md"}>
-                <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
-              </video>
+              <div className={"flex flex-col"}>
+                <video width="280" controls className={"rounded-md"}>
+                  <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
+                </video>
+                <DateInfo originDate={file.saveAt} />
+              </div>
               <FileUpload index={index} file={file} driveFolders={driveFolders} />
             </div>
           </Card>
         );
       })}
     </div>
+  );
+}
+
+function DateInfo({ originDate }: { originDate: any }) {
+  const [info, setInfo] = useState(moment(originDate).fromNow());
+
+  return (
+    <Text size={"xs"} className={"px-2"}>
+      {moment(originDate).format("DD/MM")} ({info})
+    </Text>
   );
 }
 
