@@ -4,9 +4,9 @@ import path from "path";
 import * as os from "os";
 import { google } from "googleapis";
 
-const clientId = "636038632941-rrlqtq7h3gp8l4ipu64d8pnunhpqrr8q.apps.googleusercontent.com";
-const clientSecret = "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";
-const redirectUri = "http://localhost:3000";
+export const clientId = "636038632941-rrlqtq7h3gp8l4ipu64d8pnunhpqrr8q.apps.googleusercontent.com";
+export const clientSecret = "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";
+export const redirectUri = "http://localhost:3000";
 
 type DriveFile = {
   kind: "drive#file";
