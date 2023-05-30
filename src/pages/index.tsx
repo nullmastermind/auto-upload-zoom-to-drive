@@ -10,6 +10,7 @@ import { DriveFileData, FileData } from "@/utility/types";
 import moment from "moment";
 import validator from "validator";
 import isMobilePhone = validator.isMobilePhone;
+import { notifications } from "@mantine/notifications";
 
 const useRemovedFiles = createGlobalState<Record<any, boolean>>({});
 const useSuggestLoading = createGlobalState<Record<any, boolean>>({});
@@ -174,6 +175,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
   const [accessToken] = useLocalStorage(":accessToken", "");
   const [refreshToken] = useLocalStorage(":refreshToken", "");
   const [student, setStudent] = useState<string>();
+  const [studentName, setStudentName] = useState<string>();
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
   const [loadings, setLoadings] = useSetState({
     uploading: false,
@@ -193,9 +195,11 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
         const keyword = file.keywords[j];
         if (isMobilePhone(keyword) && folder.name.includes(keyword)) {
           setStudent(folder.id);
+          setStudentName(folder.name);
           return;
         } else if (folder.name.toLowerCase() === keyword.toLowerCase()) {
           setStudent(folder.id);
+          setStudentName(folder.name);
           return;
         }
       }
@@ -315,6 +319,12 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
                   setRemovedFiles({
                     ...removedFiles,
                     [file.fullPath]: true,
+                  });
+
+                  notifications.show({
+                    title: "Uploaded video",
+                    message: `${studentName}/${fileName}.mp4`,
+                    color: "green",
                   });
                 }
               })
