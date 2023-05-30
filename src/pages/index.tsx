@@ -21,7 +21,7 @@ export default function Home() {
   const [files, setFiles] = useState<any[]>([]);
 
   return (
-    <main className="m-auto max-w-xl py-10 px-2">
+    <main className="m-auto max-w-screen-md py-10 px-2">
       <div className={"flex flex-row gap-3 items-center"}>
         <ActionIcon variant={"outline"} onClick={toggle}>
           <IconSettings />
@@ -32,6 +32,7 @@ export default function Home() {
           onClick={() => {
             close();
             setLoadings({ reload: true });
+            setFiles([]);
             axios
               .post("/api/getVideos", {
                 drive: {
@@ -120,12 +121,16 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
       {map(files, (file, index) => {
         return (
           <Card withBorder key={index}>
-            <video width="320" height="240" controls>
-              <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
-            </video>
-            <Text size={"sm"} className={"opacity-60"}>
-              {file.fullPath}
-            </Text>
+            <div className={"flex flex-row gap-2 items-start"}>
+              <video width="280" controls>
+                <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
+              </video>
+              <div>
+                <Text size={"sm"} className={"opacity-60"}>
+                  {file.fullPath}
+                </Text>
+              </div>
+            </div>
           </Card>
         );
       })}
