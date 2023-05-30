@@ -11,8 +11,9 @@ import moment from "moment";
 import validator from "validator";
 import isMobilePhone = validator.isMobilePhone;
 
-const useRemovedFiles = createGlobalState<Record<string, boolean>>({});
-const useSuggestLoading = createGlobalState<Record<string, boolean>>({});
+const useRemovedFiles = createGlobalState<Record<any, boolean>>({});
+const useSuggestLoading = createGlobalState<Record<any, boolean>>({});
+const useFileNames = createGlobalState<Record<any, Record<any, string>>>({});
 
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
@@ -25,6 +26,7 @@ export default function Home() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const [driveFolders, setDriveFolders] = useState<any[]>([]);
   const [files, setFiles] = useState<any[]>([]);
+  const [, setFileNames] = useFileNames();
 
   return (
     <main className="m-auto max-w-screen-md py-10 px-2">
@@ -39,6 +41,7 @@ export default function Home() {
             close();
             setLoadings({ reload: true });
             setFiles([]);
+            setFileNames({});
             axios
               .post("/api/getVideos", {
                 drive: {
@@ -179,6 +182,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
   const [deleteVideo, setDeleteVideo] = useLocalStorage(localStorageRemoveKey, true);
   const [removedFiles, setRemovedFiles] = useRemovedFiles();
   const [suggestLoading, setSuggestLoading] = useSuggestLoading();
+  const [fileNames, setFileNames] = useFileNames();
 
   useEffect(() => {
     if (student !== undefined) return;
@@ -197,6 +201,15 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
       }
     }
   }, [student, driveFolders, file]);
+  useEffect(() => {
+    setFileNames({
+      ...fileNames,
+      [student as any]: {
+        ...(fileNames[student as any] || {}),
+        [file.fullPath]: fileName,
+      },
+    });
+  }, [fileName, student, file]);
 
   return (
     <div className={"flex flex-col gap-2"}>
@@ -251,6 +264,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
                     folderId: student,
                     origin: fileName,
                     saveAt: file.saveAt,
+                    fileNames: map(fileNames[student as any], (value) => value),
                   })
                   .then(({ data }) => {
                     setFileName(data.data);

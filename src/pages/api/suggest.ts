@@ -12,12 +12,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     access_token: accessTokens[req.body.drive.refresh_token],
   });
   const drive = google.drive({ version: "v3", auth: oauth2Client });
-  const { folderId, saveAt, origin } = req.body;
+  const { folderId, saveAt, fileNames } = req.body;
   const files = await getDriveFiles(drive, folderId);
   let maxId = 0;
 
-  forEach(files, (file) => {
-    const fileName = file.name.toLowerCase().trim();
+  console.log("fileNames", fileNames);
+
+  const handleFileName = (fileName: string) => {
     const fileNameArr = fileName.split(" ");
     if (fileNameArr.length && fileNameArr[0].startsWith("b")) {
       const num = fileNameArr[0].replace("b", "");
@@ -25,6 +26,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         maxId = +num;
       }
     }
+  };
+
+  forEach(files, (file) => {
+    handleFileName(file.name.toLowerCase().trim());
+  });
+  forEach(fileNames, (fileName: string) => {
+    handleFileName(fileName.toLowerCase().trim());
   });
 
   res.status(200).json({
