@@ -143,7 +143,7 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
   const [student, setStudent] = useState<string>();
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
   const [loading, setLoading] = useState(false);
-  const [deleteVideo, setDeleteVideo] = useState(true);
+  const [deleteVideo, setDeleteVideo] = useLocalStorage(`${file.fullPath}:remove`, true);
 
   useEffect(() => {
     if (student !== undefined) return;
