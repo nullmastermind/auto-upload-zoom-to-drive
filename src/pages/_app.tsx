@@ -6,11 +6,11 @@ import Dynamic from "@/components/Dynamic";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <Dynamic>
-      <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme: "dark" }}>
+    <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme: "dark" }}>
+      <Dynamic>
         <Notifications />
         <Component {...pageProps} />
-      </MantineProvider>
-    </Dynamic>
+      </Dynamic>
+    </MantineProvider>
   );
 }
