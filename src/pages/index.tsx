@@ -229,12 +229,10 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
               })
               .then(({ data }) => {
                 if (data?.fileId) {
-                  if (deleteVideo) {
-                    setRemovedFiles({
-                      ...removedFiles,
-                      [file.fullPath]: true,
-                    });
-                  }
+                  setRemovedFiles({
+                    ...removedFiles,
+                    [file.fullPath]: true,
+                  });
                 }
               })
               .finally(() => {
