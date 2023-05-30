@@ -70,6 +70,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           });
       }
 
+      keywords.sort((a, b) => {
+        return b.length - a.length;
+      });
+
       return {
         fullPath: v,
         fileName: path.basename(v),
