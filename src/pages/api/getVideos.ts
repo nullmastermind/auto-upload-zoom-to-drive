@@ -10,13 +10,6 @@ export const clientSecret = "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";
 export const redirectUri = "http://localhost:3000";
 export const accessTokens: Record<string, string> = {};
 
-type DriveFile = {
-  kind: "drive#file";
-  mimeType: string;
-  id: string;
-  name: string;
-};
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = await refreshToken(req.body.drive.refresh_token);
 
@@ -77,13 +70,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
   videoFiles.sort((a, b) => {
-    return b.saveAt.getTime() - a.saveAt.getTime();
+    return a.saveAt.getTime() - b.saveAt.getTime();
   });
 
   res.status(200).json({
     files: videoFiles,
     driveFolders: (await getDriveFiles(drive, req.body.folderId)).filter(
-      (v: DriveFile) => v.mimeType === "application/vnd.google-apps.folder",
+      (v) => v.mimeType === "application/vnd.google-apps.folder",
     ),
   });
 }
