@@ -323,10 +323,18 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
 
                   notifications.show({
                     title: "Uploaded video",
-                    message: `${studentName}/${fileName}.mp4`,
+                    message: `${studentName}/${fileName}.mp4 ${file.fullPath}`,
                     color: "green",
                   });
                 }
+              })
+              .catch(() => {
+                notifications.show({
+                  title: "Failed",
+                  message: `${studentName}/${fileName}.mp4 ${file.fullPath}`,
+                  color: "green",
+                  autoClose: false,
+                });
               })
               .finally(() => {
                 setLoadings({ uploading: false });
