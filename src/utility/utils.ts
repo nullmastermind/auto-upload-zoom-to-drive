@@ -33,3 +33,13 @@ export const getDriveFiles = async (drive: drive_v3.Drive, folderId: string): Pr
     );
   }).catch(() => Promise.resolve([])) as any;
 };
+
+export function isAccessTokenExpired(oauth2Client: any) {
+  const now = new Date().getTime();
+  return oauth2Client.credentials.expiry_date < now;
+}
+
+export async function refreshAccessToken(oauth2Client: any) {
+  const { tokens } = await oauth2Client.refreshToken(oauth2Client.credentials.refresh_token);
+  oauth2Client.setCredentials(tokens);
+}

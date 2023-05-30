@@ -4,6 +4,7 @@ import { accessTokens, clientId, clientSecret, redirectUri } from "@/pages/api/g
 import { createReadStream } from "fs";
 import path from "path";
 import { remove } from "fs-extra";
+import { isAccessTokenExpired, refreshAccessToken } from "@/utility/utils";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
@@ -11,6 +12,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ...req.body.drive,
     access_token: accessTokens[req.body.drive.refresh_token],
   });
+  if (isAccessTokenExpired(oauth2Client)) {
+    await refreshAccessToken(oauth2Client);
+  }
   const drive = google.drive({ version: "v3", auth: oauth2Client });
   const { folderId, fileName, filePath, deleteVideo } = req.body;
   const fileMetadata: drive_v3.Schema$File = {

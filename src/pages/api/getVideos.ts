@@ -3,7 +3,7 @@ import * as fs from "fs";
 import path from "path";
 import * as os from "os";
 import { google } from "googleapis";
-import { getDriveFiles, refreshToken } from "@/utility/utils";
+import { getDriveFiles, isAccessTokenExpired, refreshAccessToken, refreshToken } from "@/utility/utils";
 
 export const clientId = "636038632941-rrlqtq7h3gp8l4ipu64d8pnunhpqrr8q.apps.googleusercontent.com";
 export const clientSecret = "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";
@@ -24,6 +24,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ...req.body.drive,
     access_token: accessTokens[req.body.drive.refresh_token],
   });
+
+  if (isAccessTokenExpired(oauth2Client)) {
+    await refreshAccessToken(oauth2Client);
+  }
+
   const drive = google.drive({ version: "v3", auth: oauth2Client });
 
   let videoDir = path.join(os.homedir(), "OneDrive", req.body.zoomFolder);

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { google } from "googleapis";
 import { accessTokens, clientId, clientSecret, redirectUri } from "@/pages/api/getVideos";
-import { getDriveFiles } from "@/utility/utils";
+import { getDriveFiles, isAccessTokenExpired, refreshAccessToken } from "@/utility/utils";
 import { forEach } from "lodash";
 import moment from "moment/moment";
 
@@ -11,6 +11,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ...req.body.drive,
     access_token: accessTokens[req.body.drive.refresh_token],
   });
+  if (isAccessTokenExpired(oauth2Client)) {
+    await refreshAccessToken(oauth2Client);
+  }
   const drive = google.drive({ version: "v3", auth: oauth2Client });
   const { folderId, saveAt, fileNames } = req.body;
   const files = await getDriveFiles(drive, folderId);
