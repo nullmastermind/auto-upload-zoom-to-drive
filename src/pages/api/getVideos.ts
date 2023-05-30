@@ -3,10 +3,12 @@ import * as fs from "fs";
 import path from "path";
 import * as os from "os";
 import { google } from "googleapis";
+import { refreshToken } from "@/utility/utils";
 
 export const clientId = "636038632941-rrlqtq7h3gp8l4ipu64d8pnunhpqrr8q.apps.googleusercontent.com";
 export const clientSecret = "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";
 export const redirectUri = "http://localhost:3000";
+export const accessTokens: Record<string, string> = {};
 
 type DriveFile = {
   kind: "drive#file";
@@ -16,9 +18,18 @@ type DriveFile = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const token = await refreshToken(req.body.drive.refresh_token);
+
+  accessTokens[req.body.drive.refresh_token] = req.body.drive.access_token;
+
+  if (token?.data?.access_token) {
+    accessTokens[req.body.drive.refresh_token] = token?.data?.access_token;
+  }
+
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
   oauth2Client.setCredentials({
     ...req.body.drive,
+    access_token: accessTokens[req.body.drive.refresh_token],
   });
   const drive = google.drive({ version: "v3", auth: oauth2Client });
   const getFiles = async (): Promise<any> => {
