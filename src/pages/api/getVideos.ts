@@ -49,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const dateInfo = dirName!.split(" ");
       const date = dateInfo.shift() as string;
       const time = (dateInfo.shift() as string).split(".").join(":");
-      const keywords = [...dateInfo.filter((v) => v.trim().length >= 3)];
+      const keywords = [dateInfo.join(" ").trim()];
       const chatFile = path.join(videoDir, dirName, "chat.txt");
 
       if (fs.existsSync(chatFile)) {
@@ -60,12 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .forEach((line) => {
             const phone = line.split(":").pop();
             if (phone && phone.trim().length > 0) {
-              keywords.push(
-                ...phone
-                  .trim()
-                  .split(" ")
-                  .filter((v) => v.trim().length >= 3),
-              );
+              keywords.push(phone.trim());
             }
           });
       }

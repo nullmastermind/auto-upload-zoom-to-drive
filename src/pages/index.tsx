@@ -150,7 +150,7 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
   const [student, setStudent] = useState<string>("");
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
 
-  useEffect(() => {}, [driveFolders]);
+  useEffect(() => {}, [student, driveFolders, file]);
 
   return (
     <div className={"flex flex-col gap-2"}>
