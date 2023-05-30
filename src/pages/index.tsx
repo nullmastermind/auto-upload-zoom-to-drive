@@ -5,7 +5,7 @@ import axios from "axios";
 import { IconBulb, IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { map } from "lodash";
+import { filter, map } from "lodash";
 import { DriveFileData, FileData } from "@/utility/types";
 import moment from "moment";
 import validator from "validator";
@@ -13,7 +13,7 @@ import isMobilePhone = validator.isMobilePhone;
 
 const useRemovedFiles = createGlobalState<Record<any, boolean>>({});
 const useSuggestLoading = createGlobalState<Record<any, boolean>>({});
-const useFileNames = createGlobalState<Record<any, Record<any, string>>>({});
+const useFileNames = createGlobalState<Record<any, Record<any, any>>>({});
 
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
@@ -206,7 +206,10 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
       ...fileNames,
       [student as any]: {
         ...(fileNames[student as any] || {}),
-        [file.fullPath]: fileName,
+        [file.fullPath]: {
+          fileName,
+          saveAt: file.saveAt,
+        },
       },
     });
   }, [fileName, student, file]);
@@ -264,7 +267,9 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
                     folderId: student,
                     origin: fileName,
                     saveAt: file.saveAt,
-                    fileNames: map(fileNames[student as any], (value) => value),
+                    fileNames: filter(fileNames[student as any], (v) => {
+                      return new Date(v.saveAt).getTime() < new Date(file.saveAt).getTime();
+                    }).map((value: any) => value.fileName),
                   })
                   .then(({ data }) => {
                     setFileName(data.data);
