@@ -159,7 +159,7 @@ function DateInfo({ originDate }: { originDate: any }) {
   }, [originDate]);
 
   return (
-    <Text size={"xs"} className={"px-2"}>
+    <Text size={"xs"} className={"px-2 text-center"}>
       {moment(originDate).format("DD/MM")} ({info})
     </Text>
   );
@@ -236,15 +236,22 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
             <ActionIcon
               onClick={() => {
                 setLoadings({ suggesting: true });
-                axios.post("/api/suggest", {
-                  drive: {
-                    access_token: accessToken,
-                    refresh_token: refreshToken,
-                  },
-                  folderId: student,
-                  origin: fileName,
-                  saveAt: file.saveAt,
-                });
+                axios
+                  .post("/api/suggest", {
+                    drive: {
+                      access_token: accessToken,
+                      refresh_token: refreshToken,
+                    },
+                    folderId: student,
+                    origin: fileName,
+                    saveAt: file.saveAt,
+                  })
+                  .then(({ data }) => {
+                    setFileName(data.data);
+                  })
+                  .finally(() => {
+                    setLoadings({ suggesting: false });
+                  });
               }}
               loading={loadings.suggesting}
               disabled={!student}
