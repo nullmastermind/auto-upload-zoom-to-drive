@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { google, drive_v3 } from "googleapis";
 import { clientId, clientSecret, redirectUri } from "@/pages/api/getVideos";
 import { createReadStream } from "fs";
+import path from "path";
+import { remove } from "fs-extra";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
@@ -25,6 +27,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       media: media,
       fields: "id",
     });
+
+    try {
+      if (deleteVideo) {
+        await remove(path.dirname(filePath));
+      }
+    } catch (e) {}
+
     res.status(200).json({ fileId: response.data.id });
   } catch (error) {
     console.error(error);
