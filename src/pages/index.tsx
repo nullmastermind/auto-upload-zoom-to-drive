@@ -122,7 +122,7 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
         return (
           <Card withBorder key={index}>
             <div className={"flex flex-row gap-2 items-start"}>
-              <video width="280" controls>
+              <video width="280" controls className={'rounded-md'}>
                 <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
               </video>
               <div>
