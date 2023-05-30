@@ -15,9 +15,10 @@ import Link from "next/link";
 import axios from "axios";
 import { IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { map } from "lodash";
 import { DriveFileData, FileData } from "@/utility/types";
+import moment from "moment";
 
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
@@ -146,6 +147,11 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
 }
 
 function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: DriveFileData[] }) {
+  const [student, setStudent] = useState<string>("");
+  const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
+
+  useEffect(() => {}, [driveFolders]);
+
   return (
     <div className={"flex flex-col gap-2"}>
       <Text size={"sm"} className={"opacity-60"}>
@@ -156,14 +162,27 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
           label={"Student"}
           size={"sm"}
           className={"w-full"}
-          data={driveFolders.map((v) => {
-            return {
-              label: v.name,
-              value: v.id,
-            };
-          })}
+          data={[
+            {
+              label: "---",
+              value: "",
+            },
+            ...driveFolders.map((v) => {
+              return {
+                label: v.name,
+                value: v.id,
+              };
+            }),
+          ]}
+          value={student}
         />
-        <TextInput label={"File name"} size={"sm"} className={"w-full"} />
+        <TextInput
+          label={"File name"}
+          size={"sm"}
+          className={"w-full"}
+          value={fileName}
+          onChange={(e) => setFileName(e.target.value)}
+        />
       </div>
       <div>
         <Button variant={"outline"}>Upload</Button>
