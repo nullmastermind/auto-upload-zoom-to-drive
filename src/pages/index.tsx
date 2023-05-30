@@ -141,12 +141,11 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
   const [folderId] = useLocalStorage(":folderId", "");
   const [accessToken] = useLocalStorage(":accessToken", "");
   const [refreshToken] = useLocalStorage(":refreshToken", "");
-  const [student, setStudent] = useState<string>("");
+  const [student, setStudent] = useState<string>();
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
 
   useEffect(() => {
-    console.log("student", student);
-    if (student) return;
+    if (student !== undefined) return;
 
     for (let i = 0; i < driveFolders.length; i++) {
       const folder = driveFolders[i];
