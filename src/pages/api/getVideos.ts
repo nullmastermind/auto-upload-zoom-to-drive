@@ -20,8 +20,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   oauth2Client.setCredentials({
     ...req.body.drive,
   });
-  // your oauth method, see documentation
-
   const drive = google.drive({ version: "v3", auth: oauth2Client });
   const getFiles = async (): Promise<any> => {
     return new Promise((rel) => {
