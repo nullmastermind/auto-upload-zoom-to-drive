@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/validator": "^13.7.17",
     "prettier": "^2.8.8"
   }
 }

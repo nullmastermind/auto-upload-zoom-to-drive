@@ -16,9 +16,11 @@ import axios from "axios";
 import { IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { map } from "lodash";
+import { forEach, map } from "lodash";
 import { DriveFileData, FileData } from "@/utility/types";
 import moment from "moment";
+import validator from "validator";
+import isMobilePhone = validator.isMobilePhone;
 
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
@@ -150,7 +152,23 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
   const [student, setStudent] = useState<string>("");
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
 
-  useEffect(() => {}, [student, driveFolders, file]);
+  useEffect(() => {
+    if (student) return;
+
+    for (let i = 0; i < driveFolders.length; i++) {
+      const folder = driveFolders[i];
+      for (let j = 0; j < file.keywords.length; j++) {
+        const keyword = file.keywords[j];
+        if (isMobilePhone(keyword) && folder.name.includes(keyword)) {
+          setStudent(folder.id);
+          return;
+        } else if (folder.name.toLowerCase() === keyword.toLowerCase()) {
+          setStudent(folder.id);
+          return;
+        }
+      }
+    }
+  }, [student, driveFolders, file]);
 
   return (
     <div className={"flex flex-col gap-2"}>
