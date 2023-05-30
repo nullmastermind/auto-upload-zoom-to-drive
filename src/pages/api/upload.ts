@@ -9,7 +9,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ...req.body.drive,
   });
   const drive = google.drive({ version: "v3", auth: oauth2Client });
-  const { folderId, fileName, filePath } = req.body;
+  const { folderId, fileName, filePath, deleteVideo } = req.body;
+
+  console.log(deleteVideo === true);
+
   const fileMetadata: drive_v3.Schema$File = {
     name: fileName,
     parents: [folderId],

@@ -214,6 +214,7 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
                 folderId: student,
                 fileName: fileName + ".mp4",
                 filePath: file.fullPath,
+                deleteVideo,
               })
               .then(({ data }) => {
                 if (data?.fileId) {
