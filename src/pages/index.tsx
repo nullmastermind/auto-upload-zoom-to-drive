@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Card, Checkbox, Collapse, NativeSelect, Text, TextInput, Title } from "@mantine/core";
-import { useLocalStorage, useSetState } from "react-use";
+import { createGlobalState, useLocalStorage, useSetState } from "react-use";
 import Link from "next/link";
 import axios from "axios";
 import { IconSettings } from "@tabler/icons-react";
@@ -10,6 +10,8 @@ import { DriveFileData, FileData } from "@/utility/types";
 import moment from "moment";
 import validator from "validator";
 import isMobilePhone = validator.isMobilePhone;
+
+const useRemovedFiles = createGlobalState<Record<string, boolean>>({});
 
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
@@ -119,9 +121,13 @@ export default function Home() {
 }
 
 function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: any[] }) {
+  const [removedFiles] = useRemovedFiles();
+
   return (
     <div className={"flex flex-col gap-2 mt-5"}>
       {map(files, (file, index) => {
+        if (removedFiles[file.fullPath]) return null;
+
         return (
           <Card withBorder key={index}>
             <div className={"flex flex-row gap-2 items-start"}>
@@ -145,6 +151,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
   const [loading, setLoading] = useState(false);
   const [deleteVideo, setDeleteVideo] = useLocalStorage(localStorageRemoveKey, true);
+  const [removedFiles, setRemovedFiles] = useRemovedFiles();
 
   useEffect(() => {
     if (student !== undefined) return;
@@ -222,7 +229,12 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
               })
               .then(({ data }) => {
                 if (data?.fileId) {
-                  console.log("OK", data);
+                  if (deleteVideo) {
+                    setRemovedFiles({
+                      ...removedFiles,
+                      [file.fullPath]: true,
+                    });
+                  }
                 }
               })
               .finally(() => {
