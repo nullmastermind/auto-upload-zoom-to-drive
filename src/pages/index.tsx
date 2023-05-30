@@ -1,10 +1,12 @@
-import { ActionIcon, Button, Card, Collapse, Divider, TextInput, Title } from "@mantine/core";
+import { ActionIcon, Button, Card, Collapse, Divider, Highlight, Text, TextInput, Title } from "@mantine/core";
 import { useLocalStorage, useSetState } from "react-use";
 import Link from "next/link";
 import axios from "axios";
 import { IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
+import { map } from "lodash";
+import { FileData } from "@/utility/types";
 
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
@@ -105,6 +107,23 @@ export default function Home() {
           </div>
         </Card>
       </Collapse>
+      <div>
+        <FileList files={files} driveFolders={driveFolders} />
+      </div>
     </main>
+  );
+}
+
+function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: any[] }) {
+  return (
+    <div className={"flex flex-col gap-2 mt-5"}>
+      {map(files, (file, index) => {
+        return (
+          <Card withBorder key={index}>
+            <Text size={'sm'} className={'opacity-60'}>{file.fullPath}</Text>
+          </Card>
+        );
+      })}
+    </div>
   );
 }
