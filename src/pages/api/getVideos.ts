@@ -89,6 +89,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
     });
 
+  videoFiles.sort((a, b) => {
+    return b.saveAt.getTime() - a.saveAt.getTime();
+  });
+
   res.status(200).json({
     files: videoFiles,
     driveFolders: (await getFiles()).filter((v: DriveFile) => v.mimeType === "application/vnd.google-apps.folder"),

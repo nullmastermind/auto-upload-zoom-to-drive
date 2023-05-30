@@ -2,7 +2,7 @@ import { ActionIcon, Button, Card, Checkbox, Collapse, NativeSelect, Text, TextI
 import { createGlobalState, useLocalStorage, useSetState } from "react-use";
 import Link from "next/link";
 import axios from "axios";
-import { IconSettings } from "@tabler/icons-react";
+import { IconBulb, IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { map } from "lodash";
@@ -171,7 +171,10 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
   const [refreshToken] = useLocalStorage(":refreshToken", "");
   const [student, setStudent] = useState<string>();
   const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
-  const [loading, setLoading] = useState(false);
+  const [loadings, setLoadings] = useSetState({
+    uploading: false,
+    suggesting: false,
+  });
   const [deleteVideo, setDeleteVideo] = useLocalStorage(localStorageRemoveKey, true);
   const [removedFiles, setRemovedFiles] = useRemovedFiles();
 
@@ -229,15 +232,25 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
           className={"w-32"}
           value={fileName}
           onChange={(e) => setFileName(e.target.value)}
+          rightSection={
+            <ActionIcon
+              onClick={() => {
+                setLoadings({ suggesting: true });
+              }}
+              loading={loadings.suggesting}
+            >
+              <IconBulb />
+            </ActionIcon>
+          }
         />
       </div>
       <div className={"flex flex-row gap-2 items-center"}>
         <Button
-          loading={loading}
+          loading={loadings.uploading}
           disabled={!student}
           variant={"outline"}
           onClick={() => {
-            setLoading(true);
+            setLoadings({ uploading: true });
             axios
               .post("/api/upload", {
                 drive: {
@@ -258,7 +271,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
                 }
               })
               .finally(() => {
-                setLoading(false);
+                setLoadings({ uploading: false });
                 if (deleteVideo) {
                   localStorage.removeItem(localStorageRemoveKey);
                 }
