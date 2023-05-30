@@ -207,6 +207,7 @@ function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: Driv
                 refresh_token: refreshToken,
               },
               folderId: student,
+              fileName,
             });
           }}
         >
