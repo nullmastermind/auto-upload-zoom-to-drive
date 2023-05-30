@@ -7,3 +7,10 @@ export type FileData = {
   keywords: string[];
   saveAt: string;
 };
+
+export type DriveFileData = {
+  kind: string;
+  mimeType: string;
+  id: string;
+  name: string;
+};

@@ -6,7 +6,7 @@ import { IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { map } from "lodash";
-import { FileData } from "@/utility/types";
+import { DriveFileData, FileData } from "@/utility/types";
 
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
@@ -134,7 +134,7 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
   );
 }
 
-function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: any[] }) {
+function FileUpload({ file, driveFolders }: { file: FileData; driveFolders: DriveFileData[] }) {
   return (
     <div className={"flex flex-col gap-2"}>
       <Text size={"sm"} className={"opacity-60"}>
