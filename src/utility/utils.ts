@@ -25,13 +25,19 @@ export const getDriveFiles = async (drive: drive_v3.Drive, folderId: string): Pr
     drive.files.list(
       {
         q: `'${folderId}' in parents and trashed=false`,
+        includeItemsFromAllDrives: true,
+        supportsAllDrives: true,
       },
       (err, data) => {
+        // console.log("data", data);
         if (err) throw err;
         rel(data?.data?.files || []);
       },
     );
-  }).catch(() => Promise.resolve([])) as any;
+  }).catch((e) => {
+    console.log("e getDriveFiles", e);
+    return Promise.resolve([]);
+  }) as any;
 };
 
 export function isAccessTokenExpired(oauth2Client: any) {
