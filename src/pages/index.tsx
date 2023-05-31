@@ -128,10 +128,16 @@ export default function Home() {
 function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: any[] }) {
   const [removedFiles] = useRemovedFiles();
 
+  let showed = 0;
+
   return (
     <div className={"flex flex-col gap-2 mt-5"}>
       {map(files, (file, index) => {
         if (removedFiles[file.fullPath]) return null;
+
+        showed++;
+
+        if (showed > 20) return;
 
         return (
           <Card withBorder key={index}>
