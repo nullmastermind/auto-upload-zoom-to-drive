@@ -120,6 +120,7 @@ export default function Home() {
       </Collapse>
       <div>
         <FileList files={files} driveFolders={driveFolders} />
+        <Text className={"mt-2 opacity-60"}>total: {files.length} videos</Text>
       </div>
     </main>
   );
