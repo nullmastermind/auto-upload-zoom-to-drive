@@ -5,7 +5,7 @@ import axios from "axios";
 import { IconBulb, IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { filter, map } from "lodash";
+import { filter, find, map } from "lodash";
 import { DriveFileData, FileData } from "@/utility/types";
 import moment from "moment";
 import validator from "validator";
@@ -265,6 +265,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
           value={student}
           onChange={(event) => {
             setStudent(event.target.value);
+            setStudentName(find(driveFolders, (v) => v.id === event.target.value)?.name);
           }}
         />
         <TextInput
