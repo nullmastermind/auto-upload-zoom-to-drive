@@ -31,6 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       requestBody: fileMetadata,
       media: media,
       fields: "id",
+      supportsAllDrives: true,
     });
 
     try {
