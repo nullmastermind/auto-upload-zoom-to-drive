@@ -28,6 +28,7 @@ export default function Home() {
   const [driveFolders, setDriveFolders] = useState<any[]>([]);
   const [files, setFiles] = useState<any[]>([]);
   const [, setFileNames] = useFileNames();
+  const [showAll, setShowAll] = useState(false);
 
   return (
     <main className="m-auto max-w-screen-md py-10 px-2">
@@ -119,14 +120,25 @@ export default function Home() {
         </Card>
       </Collapse>
       <div>
-        <FileList files={files} driveFolders={driveFolders} />
-        <Text className={"mt-2 opacity-60"}>total: {files.length} videos</Text>
+        <FileList files={files} driveFolders={driveFolders} showAll={showAll} />
+        <Text className={"mt-2 opacity-60 flex flex-row gap-2"}>
+          <Text>total: {files.length} videos.</Text>
+          <Text
+            color={"blue"}
+            className={"cursor-pointer hover:underline"}
+            onClick={() => {
+              setShowAll(!showAll);
+            }}
+          >
+            Show All/Short
+          </Text>
+        </Text>
       </div>
     </main>
   );
 }
 
-function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: any[] }) {
+function FileList({ files, driveFolders, showAll }: { files: FileData[]; driveFolders: any[]; showAll: boolean }) {
   const [removedFiles] = useRemovedFiles();
 
   let showed = 0;
@@ -138,7 +150,7 @@ function FileList({ files, driveFolders }: { files: FileData[]; driveFolders: an
 
         showed++;
 
-        if (showed > 20) return;
+        if (showed > 20 && !showAll) return;
 
         return (
           <Card withBorder key={index}>
