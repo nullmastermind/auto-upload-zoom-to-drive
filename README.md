@@ -12,3 +12,5 @@ cd auto-upload-zoom-to-drive
 ```bash
 ./RUN.sh
 ```
+
+After that, you can open http://localhost:3000 on your browser.
