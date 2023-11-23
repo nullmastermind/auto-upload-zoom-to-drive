@@ -25,13 +25,24 @@ export default function Home() {
   const [files, setFiles] = useState<any[]>([]);
   const [, setFileNames] = useFileNames();
   const [showAll, setShowAll] = useState(false);
+  const [driveFolder, setDriveFolder] = useLocalStorage(":driveFolder", "");
 
   return (
     <main className="m-auto max-w-screen-md py-10 px-2">
       <div className={"flex flex-row gap-3 items-center"}>
         <PhoneNumbersInput />
-        <TextInput size={"xs"} placeholder={"Thư mục Zoom"} />
-        <TextInput size={"xs"} placeholder={"Thư mục Drive"} />
+        <TextInput
+          value={zoomFolder}
+          size={"xs"}
+          placeholder={"Thư mục Zoom"}
+          onChange={(e) => setZoomFolder(e.target.value)}
+        />
+        <TextInput
+          value={driveFolder}
+          size={"xs"}
+          placeholder={"Thư mục Drive"}
+          onChange={(e) => setDriveFolder(e.target.value)}
+        />
         <Divider orientation={"vertical"} />
         <Button
           loading={loadings.reload}
@@ -61,7 +72,7 @@ export default function Home() {
         </Button>
       </div>
       <div>
-        <FileList files={files} driveFolders={driveFolders} showAll={showAll} />
+        <FileList driveFolder={driveFolder as string} files={files} driveFolders={driveFolders} showAll={showAll} />
         <Text className={"mt-2 opacity-60 flex flex-row gap-2"}>
           <Text>total: {files.length} videos.</Text>
           <Text
@@ -79,7 +90,17 @@ export default function Home() {
   );
 }
 
-function FileList({ files, driveFolders, showAll }: { files: FileData[]; driveFolders: any[]; showAll: boolean }) {
+function FileList({
+  files,
+  driveFolder,
+  driveFolders,
+  showAll,
+}: {
+  driveFolder: string;
+  files: FileData[];
+  driveFolders: any[];
+  showAll: boolean;
+}) {
   const [removedFiles] = useRemovedFiles();
 
   let showed = 0;
@@ -103,7 +124,7 @@ function FileList({ files, driveFolders, showAll }: { files: FileData[]; driveFo
                   </video>
                   <DateInfo originDate={file.saveAt} />
                 </div>
-                <FileUpload index={index} file={file} driveFolders={driveFolders} />
+                <FileUpload driveFolder={driveFolder} index={index} file={file} driveFolders={driveFolders} />
               </div>
             </div>
             <Divider />
@@ -133,7 +154,17 @@ function DateInfo({ originDate }: { originDate: any }) {
   );
 }
 
-function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolders: DriveFileData[]; index: number }) {
+function FileUpload({
+  file,
+  driveFolders,
+  index,
+  driveFolder,
+}: {
+  driveFolder: string;
+  file: FileData;
+  driveFolders: DriveFileData[];
+  index: number;
+}) {
   const localStorageRemoveKey = `${file.fullPath}:remove`;
   const [student, setStudent] = useState<string>();
   const [studentName, setStudentName] = useState<string>();
@@ -227,6 +258,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
               .post("/api/upload", {
                 fileName: fileName + ".mp4",
                 filePath: file.fullPath,
+                driveFolder,
                 deleteVideo,
               })
               .then(({ data }) => {
