@@ -1,16 +1,15 @@
-import { ActionIcon, Button, Card, Checkbox, Collapse, NativeSelect, Text, TextInput, Title } from "@mantine/core";
+import { Button, Checkbox, Divider, Select, Text, TextInput } from "@mantine/core";
 import { createGlobalState, useLocalStorage, useSetState } from "react-use";
-import Link from "next/link";
 import axios from "axios";
-import { IconBulb, IconSettings } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import { useEffect, useState } from "react";
-import { filter, find, map } from "lodash";
+import { useEffect, useMemo, useState } from "react";
+import { find, map } from "lodash";
 import { DriveFileData, FileData } from "@/utility/types";
 import moment from "moment";
 import validator from "validator";
-import isMobilePhone = validator.isMobilePhone;
 import { notifications } from "@mantine/notifications";
+import PhoneNumbersInput, { usePhoneNumbers } from "@/components/PhoneNumbersInput";
+import { DateTimePicker } from "@mantine/dates";
+import isMobilePhone = validator.isMobilePhone;
 
 const useRemovedFiles = createGlobalState<Record<any, boolean>>({});
 const useSuggestLoading = createGlobalState<Record<any, boolean>>({});
@@ -19,12 +18,9 @@ const useFileNames = createGlobalState<Record<any, Record<any, any>>>({});
 export default function Home() {
   const [folderId, setFolderId] = useLocalStorage(":folderId", "");
   const [zoomFolder, setZoomFolder] = useLocalStorage(":zoomFolder", "Documents/Zoom");
-  const [accessToken, setAccessToken] = useLocalStorage(":accessToken", "");
-  const [refreshToken, setRefreshToken] = useLocalStorage(":refreshToken", "");
   const [loadings, setLoadings] = useSetState({
     reload: false,
   });
-  const [opened, { toggle, close }] = useDisclosure(false);
   const [driveFolders, setDriveFolders] = useState<any[]>([]);
   const [files, setFiles] = useState<any[]>([]);
   const [, setFileNames] = useFileNames();
@@ -33,23 +29,20 @@ export default function Home() {
   return (
     <main className="m-auto max-w-screen-md py-10 px-2">
       <div className={"flex flex-row gap-3 items-center"}>
-        <ActionIcon variant={"outline"} onClick={toggle}>
-          <IconSettings />
-        </ActionIcon>
+        <PhoneNumbersInput />
+        <TextInput size={"xs"} placeholder={"Thư mục Zoom"} />
+        <TextInput size={"xs"} placeholder={"Thư mục Drive"} />
+        <Divider orientation={"vertical"} />
         <Button
           loading={loadings.reload}
           variant="gradient"
+          size={"xs"}
           onClick={() => {
-            close();
             setLoadings({ reload: true });
             setFiles([]);
             setFileNames({});
             axios
               .post("/api/getVideos", {
-                drive: {
-                  access_token: accessToken,
-                  refresh_token: refreshToken,
-                },
                 folderId,
                 zoomFolder,
               })
@@ -64,61 +57,9 @@ export default function Home() {
               });
           }}
         >
-          Reload Files
+          Lấy danh sách video
         </Button>
       </div>
-      <Collapse in={opened}>
-        <Card withBorder padding={"xs"} className={"my-3"}>
-          <Card.Section className={"px-6"}>
-            <Title order={3}>Settings</Title>
-          </Card.Section>
-          <div className="p-4 flex flex-col gap-2">
-            <TextInput
-              size={"xs"}
-              label="Folder ID"
-              value={folderId}
-              onChange={(e) => setFolderId(e.target.value)}
-              placeholder={"E.g: 1Gz5K3YtRNK6HZITIZ8rk-knuJpwD-uMv"}
-            />
-            <TextInput
-              size={"xs"}
-              label="Folder containing Zoom's video recordings"
-              value={zoomFolder}
-              onChange={(e) => setZoomFolder(e.target.value)}
-              placeholder={"E.g: Documents/Zoom"}
-            />
-            <TextInput
-              size={"xs"}
-              label="Access token"
-              value={accessToken}
-              onChange={(e) => setAccessToken(e.target.value)}
-            />
-            <TextInput
-              size={"xs"}
-              label="Refresh token"
-              value={refreshToken}
-              onChange={(e) => setRefreshToken(e.target.value)}
-            />
-            <div>
-              <Link href={"https://developers.google.com/oauthplayground"} target={"_blank"}>
-                https://developers.google.com/oauthplayground
-              </Link>
-              <div className={"flex flex-row gap-2"}>
-                <div className={"whitespace-nowrap opacity-60"}>Client ID:</div>
-                <TextInput
-                  className={"w-full"}
-                  size={"xs"}
-                  value={"636038632941-rrlqtq7h3gp8l4ipu64d8pnunhpqrr8q.apps.googleusercontent.com"}
-                />
-              </div>
-              <div className={"flex flex-row gap-2 mt-1"}>
-                <div className={"whitespace-nowrap opacity-60"}>Client secret:</div>
-                <TextInput className={"w-full"} size={"xs"} value={"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"} />
-              </div>
-            </div>
-          </div>
-        </Card>
-      </Collapse>
       <div>
         <FileList files={files} driveFolders={driveFolders} showAll={showAll} />
         <Text className={"mt-2 opacity-60 flex flex-row gap-2"}>
@@ -153,17 +94,20 @@ function FileList({ files, driveFolders, showAll }: { files: FileData[]; driveFo
         if (showed > 20 && !showAll) return;
 
         return (
-          <Card withBorder key={index}>
-            <div className={"flex flex-row gap-2 items-start"}>
-              <div className={"flex flex-col"}>
-                <video width="280" controls className={"rounded-md"} autoPlay={false} preload={"none"}>
-                  <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
-                </video>
-                <DateInfo originDate={file.saveAt} />
+          <>
+            <div key={index} className={"p-5"}>
+              <div className={"flex flex-row gap-2 items-start"}>
+                <div className={"flex flex-col"}>
+                  <video width="280" controls className={"rounded-md"} autoPlay={false} preload={"none"}>
+                    <source src={`/api/streamVideo?filePath=` + encodeURIComponent(file.fullPath)} type="video/mp4" />
+                  </video>
+                  <DateInfo originDate={file.saveAt} />
+                </div>
+                <FileUpload index={index} file={file} driveFolders={driveFolders} />
               </div>
-              <FileUpload index={index} file={file} driveFolders={driveFolders} />
             </div>
-          </Card>
+            <Divider />
+          </>
         );
       })}
     </div>
@@ -191,11 +135,8 @@ function DateInfo({ originDate }: { originDate: any }) {
 
 function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolders: DriveFileData[]; index: number }) {
   const localStorageRemoveKey = `${file.fullPath}:remove`;
-  const [accessToken] = useLocalStorage(":accessToken", "");
-  const [refreshToken] = useLocalStorage(":refreshToken", "");
   const [student, setStudent] = useState<string>();
   const [studentName, setStudentName] = useState<string>();
-  const [fileName, setFileName] = useState(`B ${moment(file.date).format("DD/MM")}`);
   const [loadings, setLoadings] = useSetState({
     uploading: false,
     suggesting: false,
@@ -204,6 +145,12 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
   const [removedFiles, setRemovedFiles] = useRemovedFiles();
   const [suggestLoading, setSuggestLoading] = useSuggestLoading();
   const [fileNames, setFileNames] = useFileNames();
+  const [phoneNumbers] = usePhoneNumbers();
+  const [date, setDate] = useState(new Date(`${file.date} ${file.time}`));
+  const fileName = useMemo(() => {
+    return `${student}_${moment(date).format("DD-MM hh:mm")}`;
+  }, [date, student]);
+  ``;
 
   useEffect(() => {
     if (student !== undefined) return;
@@ -224,6 +171,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
       }
     }
   }, [student, driveFolders, file]);
+
   useEffect(() => {
     setFileNames({
       ...fileNames,
@@ -246,78 +194,30 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
         </Text>
       </div>
       <div className={"flex flex-row gap-2 items-center"}>
-        <NativeSelect
-          label={"Student"}
-          size={"sm"}
-          className={"flex-grow"}
-          data={[
-            {
-              label: "---",
-              value: "",
-            },
-            ...driveFolders.map((v) => {
-              return {
-                label: v.name,
-                value: v.id,
-              };
-            }),
-          ]}
+        <Select
+          label={"Học viên"}
+          size={"xs"}
+          data={[...phoneNumbers]}
           value={student}
           onChange={(event) => {
-            setStudent(event.target.value);
-            setStudentName(find(driveFolders, (v) => v.id === event.target.value)?.name);
+            setStudent(event || "");
+            setStudentName(find(phoneNumbers, (v) => v.value === event)?.label);
           }}
+          searchable
+          clearable
         />
-        <TextInput
-          label={"File name"}
-          size={"sm"}
-          className={"w-32"}
-          value={fileName}
-          onChange={(e) => setFileName(e.target.value)}
-          rightSection={
-            <ActionIcon
-              onClick={() => {
-                setLoadings({ suggesting: true });
-                setSuggestLoading({
-                  ...suggestLoading,
-                  [student as string]: true,
-                });
-                axios
-                  .post("/api/suggest", {
-                    drive: {
-                      access_token: accessToken,
-                      refresh_token: refreshToken,
-                    },
-                    folderId: student,
-                    origin: fileName,
-                    saveAt: file.saveAt,
-                    fileNames: filter(fileNames[student as any], (v) => {
-                      return new Date(v.saveAt).getTime() < new Date(file.saveAt).getTime();
-                    }).map((value: any) => value.fileName),
-                  })
-                  .then(({ data }) => {
-                    setFileName(data.data);
-                  })
-                  .finally(() => {
-                    setLoadings({ suggesting: false });
-                    setSuggestLoading({
-                      ...suggestLoading,
-                      [student as string]: false,
-                    });
-                  });
-              }}
-              loading={loadings.suggesting}
-              disabled={!student || suggestLoading[student as string]}
-              variant={"outline"}
-              color={"blue"}
-            >
-              <IconBulb />
-            </ActionIcon>
-          }
+        <DateTimePicker
+          label={"Ngày học"}
+          size={"xs"}
+          value={date}
+          onChange={(v) => {
+            setDate(new Date(v as any));
+          }}
         />
       </div>
       <div className={"flex flex-row gap-2 items-center"}>
         <Button
+          size={"xs"}
           loading={loadings.uploading}
           disabled={!student}
           variant={"outline"}
@@ -325,11 +225,6 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
             setLoadings({ uploading: true });
             axios
               .post("/api/upload", {
-                drive: {
-                  access_token: accessToken,
-                  refresh_token: refreshToken,
-                },
-                folderId: student,
                 fileName: fileName + ".mp4",
                 filePath: file.fullPath,
                 deleteVideo,
@@ -352,7 +247,7 @@ function FileUpload({ file, driveFolders, index }: { file: FileData; driveFolder
                 notifications.show({
                   title: "Failed",
                   message: `${studentName}/${fileName}.mp4 ${file.fullPath}`,
-                  color: "green",
+                  color: "red",
                   autoClose: false,
                 });
               })

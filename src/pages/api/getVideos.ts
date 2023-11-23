@@ -2,35 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import * as fs from "fs";
 import path from "path";
 import * as os from "os";
-import { google } from "googleapis";
-import { getDriveFiles, isAccessTokenExpired, refreshAccessToken, refreshToken } from "@/utility/utils";
-
-export const clientId = "636038632941-rrlqtq7h3gp8l4ipu64d8pnunhpqrr8q.apps.googleusercontent.com";
-export const clientSecret = "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";
-export const redirectUri = "http://localhost:3000";
-export const accessTokens: Record<string, string> = {};
+import moment from "moment";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const token = await refreshToken(req.body.drive.refresh_token);
-
-  accessTokens[req.body.drive.refresh_token] = req.body.drive.access_token;
-
-  if (token?.data?.access_token) {
-    accessTokens[req.body.drive.refresh_token] = token?.data?.access_token;
-  }
-
-  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
-  oauth2Client.setCredentials({
-    ...req.body.drive,
-    access_token: accessTokens[req.body.drive.refresh_token],
-  });
-
-  if (isAccessTokenExpired(oauth2Client)) {
-    await refreshAccessToken(oauth2Client);
-  }
-
-  const drive = google.drive({ version: "v3", auth: oauth2Client });
-
   let videoDir = path.join(os.homedir(), "OneDrive", req.body.zoomFolder);
   if (!fs.existsSync(videoDir)) {
     videoDir = path.join(os.homedir(), req.body.zoomFolder);
@@ -41,6 +15,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .map((v) => {
       const dirName = path.dirname(v).split(path.sep).pop() as string;
       const dateInfo = dirName!.split(" ");
+      if (dateInfo.length < 2) {
+        dateInfo.push(moment().format("YYYY/MM/DD"));
+        dateInfo.push(moment().format("hh.mm.ss"));
+      }
       const date = dateInfo.shift() as string;
       const time = (dateInfo.shift() as string).split(".").join(":");
       const keywords = [dateInfo.join(" ").trim()];
@@ -80,9 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   res.status(200).json({
     files: videoFiles,
-    driveFolders: (await getDriveFiles(drive, req.body.folderId)).filter(
-      (v) => v.mimeType === "application/vnd.google-apps.folder",
-    ),
+    driveFolders: [],
   });
 }
 
