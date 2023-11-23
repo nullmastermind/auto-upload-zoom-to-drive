@@ -179,7 +179,7 @@ function FileUpload({
   const [phoneNumbers] = usePhoneNumbers();
   const [date, setDate] = useState(new Date(`${file.date} ${file.time}`));
   const fileName = useMemo(() => {
-    return `${student}_${moment(date).format("DD-MM hh:mm")}`;
+    return `${student}_${moment(date).format("DD-MM hh.mm")}`;
   }, [date, student]);
   ``;
 

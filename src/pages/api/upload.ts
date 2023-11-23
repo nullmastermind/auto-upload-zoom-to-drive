@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import path from "path";
-import { copyFile, ensureDir, pathExists, remove } from "fs-extra";
+import { copy, copyFile, ensureDir, pathExists, remove } from "fs-extra";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { fileName, filePath, deleteVideo, driveFolder } = req.body;
@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error("drive folder not found");
     }
 
-    await copyFile(filePath, path.join(driveFolder, fileName));
+    await copy(filePath, path.join(driveFolder, fileName));
 
     try {
       if (deleteVideo) {
